@@ -1,0 +1,12 @@
+## Pipeline for analysis of Transposon Family Enrichment for Chromatin Marks and heatmap generation 
+
+#Blueprint Datasets for H3K9me3 and H3K27ac in primary blood cell types downloaded using wget.sbatch
+
+#Enrichment of H3K9me3 and H3K27ac across annotated transposon families scored using gigglesearchplus.sbatch
+
+#Matrix of enrichment scores in all cell types for both marks was generated using makegigglematrix.sbatch
+
+#A subsetted matrix was made of only TE families with enrichment scores above 100 or below -100 using the following operation:
+#awk '{if($2>100 || $2<-100 || $3>100 || $3<-100 || $4>100 || $4<-100 || $5>100 || $5<-100 || $6>100 || $6<-100 || $7>100 || $7<-100 || $8>100 || $8<-100 || $9>100 || $9<-100 || $10>100 || $10<-100 || $11>100 || $11<-100 || $12>100 || $12<-100 || $13>100 || $13<-100 || $14>100 || $14<-100 || $15>100 || $15<-100 || $16>100 || $16<-100 || $17>100 || $17<-100 || $18>100 || $18<-100 || $19>100 || $19<-100 || $20>100 || $20<-100 || $21>100 || $21<-100 || $22>100 || $22<-100 || $23>100 || $23<-100 || $24>100 || $24<-100 || $25>100 || $25<-100 || $26>100 || $26<-100 || $27>100 || $27<-100 || $28>100 || $28<-100 || $29>100 || $29<-100 || $30>100 || $30<-100 || $31>100 || $31<-100 || $32>100 || $32<-100 || $33>100 || $33<-100) print}' giggleMatrix.tab >subset_giggleMatrix.tab
+
+#Heatmaps of these matrices were made using giggleheatmap.py

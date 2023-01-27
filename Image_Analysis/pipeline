@@ -1,0 +1,26 @@
+## Pipeline for segmenting cells and measuring intensity per cell using ImageJ
+
+#open all three channels as hyperstack
+
+#In 405 channel (DAPI):
+# process -> filter -> gaussian blur (radius = 2.00)
+# image -> adjust -> threshold
+# edit -> selection -> create selection 
+# analyze -> tools -> ROI Manager -> Add ROI
+
+#In 488 channel (Wheat Germ Agglutinin):
+# process -> noise -> despeckle
+# image -> adjust -> threshold
+# select roi from 405 channel -> edit -> fill
+# select roi from 405 channel -> Delete ROI
+# process -> binary -> convert to mask
+# process -> binary ->open
+# if necessary:process -> binary -> fill holes
+# process -> binary -> watershed
+# process -> binary -> convert to mask
+# analyze -> analyze particles (>30 micron^2, circularity=0-1, add to manager, exclude on edges, include holes)
+
+#In 647 channel:
+# select ROI from above
+# manually remove ROIs that were incorrectly segmented
+# analyze -> measure

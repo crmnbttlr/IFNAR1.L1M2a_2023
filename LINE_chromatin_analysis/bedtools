@@ -1,0 +1,18 @@
+## Lists of LINEs with and without each chromatin mark were made using BEDtools like the following:
+
+module load bedtools
+
+#ie To make a list of all L1s with H3K9me3
+bedtools intersect -u -a all_L1s_500bpmin.bed -b H3K9me3_narrowPeak.bed >L1s_with_H3K9me3.bed
+
+#ie To make a list of all L1s with any enhancer accociated marks
+cat L1s_with_H3K4me1.bed L1s_with_H3K27ac.bed L1s_with_ATAC.bed >temp
+bedtools sort -i temp >temp2
+bedtools merge -d -1 -i temp2 >temp3
+bedtools intersect -u all_L1s_500bpmin.bed -b temp3 >L1s_with_enhMarks.bed
+
+#ie To make a list of all L1s with both H3K9me3 and enhancer associated marks
+bedtools intersect -u -a L1s_with_H3K9me3.bed -b L1s_with_enhMarks.bed >L1s_with_H3K9me3_and_enhMarks.bed
+
+#ie To make a list of all L1s with H3K9me3 but no enhancer associated marks
+bedtools intersect -v -a L1s_with_H3K9me3.bed -b L1s_with_enhMarks.bed >L1s_with_H3K9me3_butno_enhMarks.bed

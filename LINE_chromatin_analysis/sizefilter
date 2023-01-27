@@ -1,0 +1,2 @@
+## Annotated LINEs were subsetted by a minimum length of 500bp using the following opperation:
+#awk '{if(($3-$2)>500) print}' all_L1s.bed >all_L1s_500bpmin.bed
