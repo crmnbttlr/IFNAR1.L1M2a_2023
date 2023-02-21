@@ -17,7 +17,7 @@
 
 module load singularity
 
-deeptools=/scratch/Shares/public/singularity/deeptools-3.0.1-py35_1.img
+deeptools=/scratch/directory/singularity/deeptools-3.0.1-py35_1.img
 
 queries=($(ls $inDir/*.sorted.uniq.bam | xargs -n 1 basename))
 

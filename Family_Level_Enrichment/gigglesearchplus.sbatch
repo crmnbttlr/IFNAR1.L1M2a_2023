@@ -39,7 +39,7 @@ bgzip ${inDir}/${queries[$SLURM_ARRAY_TASK_ID]}
 # run giggle search
 echo $(date +"[%b %d %H:%M:%S] Starting giggle search...")
 
-/Shares/CL_Shared/bin/giggle search -q ${inDir}/${queries[$SLURM_ARRAY_TASK_ID]%.bed}.bed.gz -i ${repeatIndex} -s -g 3209286105 > ${outDir}/${queries[$SLURM_ARRAY_TASK_ID]%.bed}.giggleStats.tmp
+/bin/giggle search -q ${inDir}/${queries[$SLURM_ARRAY_TASK_ID]%.bed}.bed.gz -i ${repeatIndex} -s -g 3209286105 > ${outDir}/${queries[$SLURM_ARRAY_TASK_ID]%.bed}.giggleStats.tmp
 
 # remove full index name from output
 echo $(date +"[%b %d %H:%M:%S] Removing full repeat name...")

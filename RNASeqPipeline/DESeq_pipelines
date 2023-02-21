@@ -1,0 +1,48 @@
+## install and load packages
+library(BiocInstaller)
+biocManager::install("DESeq2")
+library("DESeq2")
+devtools::install_github("zhangyuqing/sva-devel")
+
+## Read in the output from featureCounts and metadata table
+featurecounts <- read.csv("directory/featureCounts_s2.txt", sep="", header = TRUE, skip = 1, row.names = "Geneid")
+metadata <- read.delim("directory/metadata.txt")
+batches <- metadata$batch
+groups <- c(3,3,4,4,3,3,4,4,3,3,4,4,7,7,8,8,7,7,8,8,5,6,7,8,5,2,2,1,1,2,2,1,1,2,2,1,
+1,6,7,8,5,6,7,8,5,6,7,8,5,6,7,8,5,6,7,8,6,6,5,5,6,6,5,5)
+
+## Remove the first five columns (chr, start, end, strand, length).
+uncorrected <- featurecounts[ ,6:ncol(featurecounts)]
+corrected <-ComBat_seq(uncorrected, batch=batches, group=groups)
+countdata <- as.matrix(corrected)
+
+##identifying interferon stimulated genes in WT 4hr vs untreated
+# subset countdata by genotype
+treatment_WTc <- subset(metadata, genotype="1WTc")
+treatment_WTc <- treatment_WTc$treatment
+coldata_WTc <- data.frame(row.names=colnames(countdata_WTc), treatment_WTc)
+dds_WTc_4vsUT <- DESeqDataSetFromMatrix(countData = countdata_WTc, colData = coldata_WTc, design = ~ treatment_WTc)
+dds_WTc_4vsUT <- DESeq(dds_WTc_4vsUT)
+res_WTc_4vsUT <- results(dds_WTc_4vsUT, contrast=c("treatment_WTc", "B4hr", "AUT"))
+resdata_WTc_4vsUT <- merge(as.data.frame(res_WTc_4vsUT), as.data.frame(counts(dds_WTc_4vsUT, normalized = TRUE)), by = "row.names", sort = FALSE)
+ISGs <- subset(resdata_WTc_4vsUT, padj<0.05)
+
+##pairwise comparison of WT vs KO within timepoints
+# subset countdata by timepoint
+genotype_UT <- subset(metadata, treatment="AUT")
+genotype_UT <- genotype_UT$genotype
+coldata_UT <- data.frame(row.names=colnames(countdata_UT), genotype_UT)
+dds_UT_KOvsWT <- DESeqDataSetFromMatrix(countData = countdata_UT, colData = coldata_UT, design = ~ genotype_UT)
+dds_UT_KOvsWT <- DESeq(dds_UT_KOvsWT)
+res_UT_KOvsWT <- results(dds_UT_KOvsWT, contrast=c("genotype_UT", "2KOc", "1WTc"))
+res_UT_KOvsWT <- na.omit(res_UT_KOvsWT)
+res_UT_KOvsWT <- res_UT_KOvsWT[order(res_UT_KOvsWT$padj),]
+resdata_UT_KOvsWT <- merge(as.data.frame(res_UT_KOvsWT), as.data.frame(counts(dds_UT_KOvsWT, normalized = TRUE)), by = "row.names", sort = FALSE)
+
+##likelihood ratio test
+ddsLRT <- DESeqDataSetFromMatrix(countData=round(countdata), colData=metadata, design=~genotype+time+genotype:time)
+dsddsLRT <-DESeq(ddsLRT, test = "LRT", reduced=~time)
+dsddsLRTres <- results(dsddsLRT)
+resdata_LRT <- merge(as.data.frame(dsddsLRTres),as.data.frame(counts(dsddsLRT, normalized=TRUE)), by = "row.names", sort=FALSE)
+resdata_LRT$Rank <- rank(resdata_LRT$padj)
+resdata_LRT_omit <- na.omit(resdata_LRT)
